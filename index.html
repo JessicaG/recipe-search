@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: #5c1f4b;
+}
+
+h1 {
+    color: white;
+    text-align: left;
+}
+
+p {
+    font-family: verdana;
+    font-size: 20px;
+}
+ul {
+	color: white;
+	list-style-type: none;
+}
+#search-box {
+	width: 200px; 
+	height: 20px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+#search {
+  height: 100%;
+  width: 65%;
+  position: absolute;
+  left: 10px;
+
+}
+
+#search-area{
+	padding-left: 50px;
+}
+#sidebar {
+  height: 100%;
+  width: 35%;
+  position: absolute;
+  
+  right: -2%;
+  z-index: 99;
+  color: #939393;
+  background-color: #e2c9ed;
+
+  p {
+    margin: 0 0 10px 1em;
+  }
+}
+</style>
+	<title>Recipes for search</title>
+</head>
+<body>
+<div id="wrapper">
+	<div id="search-area">
+		<h1>Search Recipes to Star 🌟</h1>
+		 <input type="" name="" placeholder="🔍" id="search-box">
+		<ul>
+		</ul>
+	</div>
+	<div id="sidebar">
+	<h1>🌟🌟🌟</h1>
+	</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/algoliasearch/3/algoliasearch.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
+<script type="text/javascript">
+	var input = document.querySelector('input')
+	input.addEventListener('input', _.debounce(function(event){
+		if (event.target.value.length < 3)
+			return
+		var ul = document.querySelector('ul')
+		Array.prototype.slice.call(ul.children)
+			.forEach(li => li.parentNode.removeChild(li))
+
+		fetch(`/${event.target.value}`, { method: 'POST' })
+			.then(body => body.json())
+			.then(content => appendSearchResults(content))
+		if (event.target.value.length == 0) 
+			ul.empty();
+	}, 500))
+
+	function appendSearchResults(content){
+		var ul = document.querySelector('ul')
+		var fragment = document.createDocumentFragment()
+		
+		var searchResults = content.hits.map(hit => [hit.title, hit.image_url, hit.source_url])
+		console.log(searchResults)
+		searchResults
+			.map(searchResult => createLi(searchResult))
+			.map(li => fragment.appendChild(li))
+		ul.appendChild(fragment)
+	}
+
+	function createLi(searchResult) {
+		var li = document.createElement('li')
+		var p = document.createElement('p')
+		p.textContent = searchResult[0]
+		
+		var img = document.createElement('img')
+		img.setAttribute('src',searchResult[1])
+		
+		var link = document.createElement('a')
+		link.setAttribute('href', searchResult[2])
+
+		li.appendChild(p)
+		li.appendChild(img)
+		li.appendChild(link)
+		
+		return li
+	}
+</script>
+</body>
+</html>
